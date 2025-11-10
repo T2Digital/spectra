@@ -1,0 +1,8 @@
+{
+  "name": "Spectra - Eyewear Store",
+  "description": "A modern, luxury, and trendy mobile-first e-commerce store for eyeglasses, built with React and Tailwind CSS, featuring virtual try-on capabilities and seamless checkout.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}

@@ -1,0 +1,90 @@
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { signInUser } from '../firebase/services';
+
+const LoginPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      await signInUser(email, password);
+      navigate('/'); // Redirect to home on successful login
+    } catch (err: any) {
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        setError('البريد الإلكتروني أو كلمة المرور غير صحيحة.');
+      } else {
+        setError('حدث خطأ ما. يرجى المحاولة مرة أخرى.');
+      }
+      console.error(err);
+    } finally {
+        setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-[70vh] bg-gray-50 flex flex-col justify-center items-center p-4">
+      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
+        <div className="text-center mb-8">
+            <h1 className="text-3xl font-extrabold text-brand-primary">تسجيل الدخول</h1>
+            <p className="text-gray-500 mt-2">مرحباً بعودتك!</p>
+        </div>
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني</label>
+            <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-brand-accent focus:border-brand-accent"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">كلمة المرور</label>
+            <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-brand-accent focus:border-brand-accent"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+
+          <div>
+            <button
+            type="submit"
+            disabled={loading}
+            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-accent disabled:bg-gray-400"
+            >
+            {loading ? 'جاري الدخول...' : 'تسجيل الدخول'}
+            </button>
+          </div>
+        </form>
+         <p className="mt-6 text-center text-sm text-gray-600">
+            ليس لديك حساب؟{' '}
+            <Link to="/register" className="font-medium text-brand-accent hover:underline">
+              أنشئ حسابًا جديدًا
+            </Link>
+          </p>
+      </div>
+    </div>
+  );
+};
+
+export default LoginPage;
